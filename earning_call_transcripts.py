@@ -29,7 +29,7 @@ def chunk_transcript(text, max_tokens=400):
     current_chunk = []
     current_length = 0
 
-    # ensures chunks contain full sentences
+
     for sentence in sentences:
         token_estimate = len(sentence.split()) # rough word count for token estimate
         if current_length + token_estimate > max_tokens:
@@ -45,12 +45,3 @@ def chunk_transcript(text, max_tokens=400):
     
     return chunks
 
-if __name__ == '__main__':
-    dataset_path = "C:/Users/zakyy/.cache/kagglehub/datasets/ramssvimala/earning-call-transcripts/versions/3/cleaned_ECTs_dataset"
-
-    results = walk_dataset(dataset_path)
-    test = results[0]["transcript"]
-    print(test[:500])
-
-    chunks = chunk_transcript(test)
-    print("NUM OF CHUNKS:",len(chunks))

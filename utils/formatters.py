@@ -17,13 +17,14 @@ company_to_ticker = {
     "Amazon": "AMZN",
     "AMD": "AMD",
     "Apple": "AAPL",
-    "American Express": "AXP",
+    "AXP": "AXP",
     "BAM": "BAM",
     "Bank of America": "BAC",
     "BBVA": "BBVA.MC",
     "BKNG": "BKNG",
     "BMW": "BMW.DE",
     "BP": "BP.L",
+    "Branco": "MDIA3.SA",
     "Capgemini": "CAP.PA",
     "Cardinal Health": "CAH",
     "Cisco": "CSCO",
@@ -37,8 +38,7 @@ company_to_ticker = {
     "Ford": "F",
     "GM": "GM",
     "IBM": "IBM",
-    "JPMorgan Chase": "JPM",
-    "L'Oreal": "OR.PA",
+    "JPM": "JPM",
     "Loreal": "OR.PA",
     "Louis Vuitton": "LVMH.PA",
     "Lululemon": "LULU",
@@ -59,3 +59,10 @@ company_to_ticker = {
     "Walmart": "WMT",
     "Walt Disney": "DIS",
 }
+
+# sees if the model's sentiment was reflected in the price return
+def decide_accuracy(sentiment_score, price_return):
+    if (sentiment_score > 0.5 and price_return < 0) or (sentiment_score < 0.5 and price_return > 0):
+        return False
+    else:
+        return True
