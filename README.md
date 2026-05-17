@@ -2,7 +2,9 @@
 
 I wanted to look into whether the sentiment on an earnings call was reflected in the share price movement of stocks following their earnings call. 
 
-To do this, I used the publicaly available FinBERT NLP model to analyse the sentiment of financial text, as well as these earning call transcripts (https://www.kaggle.com/datasets/ramssvimala/earning-call-transcripts?select=NLP_Dataset) to return the sentiment of each earning call in the dataset.
+To do this, I used the publicaly available FinBERT NLP model to analyse the sentiment of financial text, as well as these earning call transcripts (https://www.kaggle.com/datasets/ramssvimala/earning-call-transcripts?select=NLP_Dataset) to return the sentiment of each earning call in the dataset. 
+
+To get the earnings call dates 
 
 After that, I used the Yahoo Finance API to return the historical price data of each stock in the dataset, and got the price difference over the period I was looking at
 

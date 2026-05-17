@@ -66,3 +66,4 @@ def decide_accuracy(sentiment_score, price_return):
         return False
     else:
         return True
+    
