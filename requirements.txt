@@ -2,3 +2,5 @@ kaggle
 transformers
 yfinance
 pandas
+fastapi
+uvicorn
