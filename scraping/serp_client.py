@@ -7,9 +7,9 @@ from urllib3.util.retry import Retry
 logger = logging.getLogger(__name__)
 
 
-def build_serp_params(ticker, quarter=None, year=None, site="fool.com", num=5):
+def build_serp_params(ticker, quarter=None, year=None, site="fool.com", num=10):
 
-    search_terms = [ticker, "earnings call transcript"]
+    search_terms = [ticker, "transcript"]
     if quarter: search_terms.append(str(quarter).strip().lower())
     if year: search_terms.append(str(year))
 

@@ -14,6 +14,9 @@
 
 The `transcript` field is returned as a single string.
 
+> [!NOTE]
+> This application scrapes transcripts directly from **Motley Fool** (`fool.com`). Therefore, only tickers/quarters with earnings call transcripts published on Motley Fool are supported. If no transcript is found for the requested ticker, the API returns a `500` response: `"No earnings call transcript found for ticker <TICKER>"`.
+
 ## Design
 
 ##### Sequence Diagram

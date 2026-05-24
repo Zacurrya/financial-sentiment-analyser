@@ -8,3 +8,4 @@ QUARTER_YEAR_PATTERN = re.compile(
 	r"[/-_]?q(?P<quarter>[1-4])[-_ ]?(?P<year>\d{4})",
 	re.IGNORECASE,
 )
+TICKER_BOUNDARY_PATTERN_FORMAT = r"(?:^|[/_\-])({})(?:$|[/_\-])"

@@ -1,12 +1,13 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Optional
-
 from api.exception_handlers import (
     register_exception_handlers,
 )
 from api.transcript_service import TranscriptService
-from earnings_call import EarningsCall
+from models import EarningsCall, AnalyseRequest, EarningCallRequest
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = FastAPI()
 register_exception_handlers(app)
@@ -14,11 +15,6 @@ register_exception_handlers(app)
 
 
 # -- W/ SENTIMENT CALC --
-class AnalyseRequest(BaseModel):
-    ticker: str
-    quarter: Optional[str] = None
-    year: Optional[int] = None
-    
 @app.post("/analysed-earnings", 
           summary="Analyse an earnings call",
           description="Fetches the most recent earnings call transcript of a given ticker, as well as it's analysed sentiment",
@@ -31,11 +27,6 @@ def analyse(request: AnalyseRequest):
 
 
 # -- WITHOUT SENTIMENT CALCS --
-class EarningCallRequest(BaseModel):
-    ticker: str
-    quarter: Optional[str] = None
-    year: Optional[int] = None
-    
 @app.post("/earnings-call", 
           summary="Return the transcript object",
           response_model=EarningsCall,
