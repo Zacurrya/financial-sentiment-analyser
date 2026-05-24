@@ -1,7 +1,24 @@
 ## Setup
 
-**1. 'pip install requirements.txt'**
-**2. POST '/analyse' API endpoint -** transcript string parameter -> returns sentiment and confidence level
+**1. `pip install -r requirements.txt`**
+**2. Run the API:** `uvicorn api.main:app --reload`
+
+### API Endpoints
+
+- **POST `/analysed-earnings`**
+  - Body: `{ "ticker": "AAPL", "quarter": "Q1" }`
+  - Returns: full `EarningsCall` object with sentiment.
+- **POST `/earning-call`**
+  - Body: `{ "ticker": "AAPL", "quarter": "Q1" }`
+  - Returns: `EarningsCall` without sentiment (scrape only).
+
+The `transcript` field is returned as a single string.
+
+## Design
+
+##### Sequence Diagram
+
+![1779551988039](image/README/1779551988039.png)
 
 ## Study
 
@@ -19,9 +36,13 @@ After that, I used the Yahoo Finance API to return the historical price data of 
 
 | Time Period          | Alignment Rate | Correlation |
 | -------------------- | -------------- | ----------- |
-| **Quarter**    | 52.95%         | 0.08        |
+| **Quarter**    | 53.33%         | 0.00        |
 | **+- 5 days** |                |             |
 
 ### Interpretation
 
 Quarterly results show weak correlation and an alignment rate between the sentiment score and price return that is no better than a coin flip. This is consistent with the efficient market hypothesis - quarterly returns already account for market expectations formed ahead of the call, diluting the post-call sentiment signal over a 3-month window.
+
+### Analysis Utilities
+
+- `analysis/quarter_returns.py` fetches earnings call dates via the transcript service and computes price returns around the call date.
