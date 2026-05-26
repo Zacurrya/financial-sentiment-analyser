@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class TranscriptService:
-    def get_earnings_call(self, ticker, quarter=None, year=None, compute_sentiment: bool = True) -> EarningsCall:
+    def get_earnings_call(self, ticker: str, quarter: int | None = None, year: int | None = None) -> EarningsCall:
 
         # get transcript URL metadata
         try:
@@ -37,23 +37,28 @@ class TranscriptService:
             raise RuntimeError(f"Error scraping transcript: {type(e).__name__}: {e}") from e
             
         # assemble result
-        if compute_sentiment and data.transcript:
-            # analyse earning call sentiment
-            try:
-                score = get_sentiment_score(data.transcript)
-                label = "positive" if score > 0 else "negative" if score < 0 else "neutral"
-            except Exception as e:
-                raise RuntimeError(f"Error analysing transcript sentiment: {type(e).__name__}: {e}") from e
-        else: 
-            score, label = None, None
+        if not data.transcript:
+            raise RuntimeError(f"Scraped transcript is empty for ticker {ticker}")
+
+        # analyse earning call sentiment
+        try:
+            score = get_sentiment_score(data.transcript)
+            label = "positive" if score > 0 else "negative" if score < 0 else "neutral"
+        except Exception as e:
+            raise RuntimeError(f"Error analysing transcript sentiment: {type(e).__name__}: {e}") from e
+
+        fq = transcript_url_data.financial_quarter or quarter
+        fy = transcript_url_data.financial_year or year
+        if fq is None or fy is None:
+            raise RuntimeError(f"Could not determine financial quarter and year for {ticker}")
 
         # assemble and return
         return EarningsCall(
             ticker=ticker,
-            financial_quarter=transcript_url_data.financial_quarter or quarter,
-            financial_year=transcript_url_data.financial_year or year,
+            financial_quarter=fq,
+            financial_year=fy,
             date=call_date or "",
-            **data.dict(),
+            **data.model_dump(),
             sentiment_score=score,
             label=label,
         )

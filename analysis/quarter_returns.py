@@ -7,7 +7,7 @@ from api.transcript_service import TranscriptService
 
 def get_earning_call_return(ticker, quarter=None, window_days=5):
     service = TranscriptService()
-    earnings_call = service.get(ticker, quarter, compute_sentiment=False)
+    earnings_call = service.get_earnings_call(ticker, quarter=quarter)
     if not earnings_call.date:
         return None
 

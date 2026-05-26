@@ -10,7 +10,12 @@ logger = logging.getLogger(__name__)
 def build_serp_params(ticker, quarter=None, year=None, site="fool.com", num=10):
 
     search_terms = [ticker, "transcript"]
-    if quarter: search_terms.append(str(quarter).strip().lower())
+    if quarter:
+        q_str = str(quarter).strip().lower()
+        if q_str in {"1", "2", "3", "4"}:
+            search_terms.append(f"q{q_str}")
+        else:
+            search_terms.append(q_str)
     if year: search_terms.append(str(year))
 
     api_key = os.getenv("SERPAPI_KEY")

@@ -23,7 +23,7 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from dotenv import load_dotenv
 
-from constants import SPEAKER_PREFIX_RE
+from constants import SPEAKER_PREFIX_RE, WHITESPACE_RE
 from models import ExtractTranscriptResult
 
 load_dotenv()
@@ -50,7 +50,7 @@ def clean_transcript(transcript: Iterable[str]) -> List[str]:
     cleaned: List[str] = []
     for line in lines:
         text = line.replace("\\n", " ").replace("\n", " ").replace("\r", " ")
-        text = re.sub(r"\s+", " ", text).strip()
+        text = WHITESPACE_RE.sub(" ", text).strip()
         text = SPEAKER_PREFIX_RE.sub("", text)
         if text:
             cleaned.append(text)

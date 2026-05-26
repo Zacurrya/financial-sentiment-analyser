@@ -85,7 +85,7 @@ def build_results(tickers: Iterable[str]) -> list[TestResult]:
     results: list[TestResult] = []
 
     for ticker in tickers:
-        earnings_call = service.get_earnings_call(ticker, quarter=None, compute_sentiment=True)
+        earnings_call = service.get_earnings_call(ticker, quarter=None)
         call_dt = parse_call_date(earnings_call.date)
         if call_dt is None or earnings_call.sentiment_score is None or earnings_call.label is None:
             continue

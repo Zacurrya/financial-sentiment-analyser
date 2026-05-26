@@ -1,18 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
 
 class EarningsCall(BaseModel):
+    model_config = {"extra": "ignore"}
+    
     ticker: str
-    financial_quarter: Optional[str] = None
-    financial_year: Optional[int] = None
+    financial_quarter: int
+    financial_year: int
     date: str
     summary: str
     takeaways: List[str]
     risks: List[str]
     transcript: str
-    sentiment_score: Optional[float] = None
-    label: Optional[str] = None
+    sentiment_score: float
+    label: str
 
 
 class SerpUrl(BaseModel):
@@ -33,7 +35,7 @@ class SerpAPIResponse(BaseModel):
 class TranscriptURLData(BaseModel):
     url: Optional[str] = None
     date: str = ""
-    financial_quarter: Optional[str] = None
+    financial_quarter: Optional[int] = None
     financial_year: Optional[int] = None
 
 
@@ -46,11 +48,11 @@ class ExtractTranscriptResult(BaseModel):
 
 class AnalyseRequest(BaseModel):
     ticker: str
-    quarter: Optional[str] = None
+    quarter: Optional[int] = Field(None, ge=1, le=4)
     year: Optional[int] = None
 
 
 class EarningCallRequest(BaseModel):
     ticker: str
-    quarter: Optional[str] = None
+    quarter: Optional[int] = Field(None, ge=1, le=4)
     year: Optional[int] = None

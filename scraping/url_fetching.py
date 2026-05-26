@@ -3,7 +3,7 @@ import re
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 
-from constants import QUARTER_YEAR_PATTERN, TICKER_BOUNDARY_PATTERN_FORMAT
+from constants import URL_QUARTER_YEAR_PATTERN, TICKER_BOUNDARY_PATTERN_FORMAT, NON_ALNUM_RE, DATE_PATH_RE
 from models import TranscriptURLData
 from scraping import serp_client
 
@@ -19,12 +19,12 @@ def _normalize_quarter(value):
     if not text: return None
     if text.startswith("Q"): text = text[1:]
 
-    return f"Q{text}" if text in {"1", "2", "3", "4"} else None
+    return int(text) if text in {"1", "2", "3", "4"} else None
 
 def extract_date(url):
     if not url: return None
     path = urlparse(url).path.rstrip("/")
-    match = re.search(r"/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/", path + "/")
+    match = DATE_PATH_RE.search(path + "/")
     if not match:
         return None
 
@@ -46,8 +46,8 @@ def url_matches_ticker(url: str, ticker: str) -> bool:
     # generate candidate strings to match the ticker
     cands = {
         ticker_text,
-        re.sub(r"[^a-z0-9]", "-", ticker_text),
-        re.sub(r"[^a-z0-9]", "", ticker_text)
+        NON_ALNUM_RE.sub("-", ticker_text),
+        NON_ALNUM_RE.sub("", ticker_text)
     }
     
     # filter out empty candidates
@@ -62,7 +62,7 @@ def url_matches_ticker(url: str, ticker: str) -> bool:
     match = pattern.search(path)
     if not match: return False
 
-    quarter_match = QUARTER_YEAR_PATTERN.search(path)
+    quarter_match = URL_QUARTER_YEAR_PATTERN.search(path)
     if not quarter_match: return False
 
     return match.start(1) < quarter_match.start()
@@ -72,10 +72,10 @@ def url_matches_ticker(url: str, ticker: str) -> bool:
 def extract_quarter_and_year(url):
     if not url: return None, None
 
-    match = QUARTER_YEAR_PATTERN.search(url)
+    match = URL_QUARTER_YEAR_PATTERN.search(url)
     if not match: return None, None
 
-    return f"Q{match.group('quarter')}", int(match.group('year'))
+    return int(match.group('quarter')), int(match.group('year'))
 
 def url_matches_quarter(url: str, quarter) -> bool:
     normalized_quarter = _normalize_quarter(quarter)
