@@ -80,17 +80,22 @@ def is_aligned(sentiment_score: float, price_return: float) -> bool:
     return False
 
 
-def build_results(tickers: Iterable[str]) -> list[TestResult]:
+def build_results(tickers: Iterable[str], window_days: int = 5) -> list[TestResult]:
     service = TranscriptService()
     results: list[TestResult] = []
 
     for ticker in tickers:
-        earnings_call = service.get_earnings_call(ticker, quarter=None)
+        try:
+            earnings_call = service.get_earnings_call(ticker, quarter=None)
+        except Exception as e:
+            print(f"Error fetching transcript for {ticker}: {e}")
+            continue
+
         call_dt = parse_call_date(earnings_call.date)
         if call_dt is None or earnings_call.sentiment_score is None or earnings_call.label is None:
             continue
 
-        price_return = get_price_return(ticker, call_dt)
+        price_return = get_price_return(ticker, call_dt, window_days=window_days)
         if price_return is None:
             continue
 
@@ -110,22 +115,57 @@ def build_results(tickers: Iterable[str]) -> list[TestResult]:
 
 
 def main() -> None:
-    results = build_results(TEST_TICKERS)
-    if not results:
-        print("No results collected.")
-        return
+    # Pre-fetch calls to optimize performance and prevent redundant API queries
+    service = TranscriptService()
+    calls = []
+    print("Fetching earnings calls...")
+    for ticker in TEST_TICKERS:
+        try:
+            ec = service.get_earnings_call(ticker, quarter=None)
+            calls.append(ec)
+        except Exception as e:
+            print(f"Failed to fetch {ticker}: {e}")
 
-    df = pd.DataFrame([result.__dict__ for result in results])
-    df.to_csv("results.csv", index=False)
+    for window in [1, 3, 5]:
+        print(f"\n--- Results for {window}-day window ---")
+        results = []
+        for earnings_call in calls:
+            call_dt = parse_call_date(earnings_call.date)
+            if call_dt is None or earnings_call.sentiment_score is None or earnings_call.label is None:
+                continue
 
-    alignment_rate = df["aligned"].mean()
-    correlation = df["sentiment_score"].corr(df["price_return"])
+            price_return = get_price_return(earnings_call.ticker, call_dt, window_days=window)
+            if price_return is None:
+                continue
 
-    print(f"Alignment rate: {alignment_rate:.2%}")
-    if pd.isna(correlation):
-        print("Correlation: unavailable (insufficient data)")
-    else:
-        print(f"Correlation: {correlation:.2f}")
+            aligned = is_aligned(earnings_call.sentiment_score, price_return)
+            results.append(
+                TestResult(
+                    ticker=earnings_call.ticker,
+                    call_date=earnings_call.date,
+                    sentiment_score=earnings_call.sentiment_score,
+                    sentiment_label=earnings_call.label,
+                    price_return=price_return,
+                    aligned=aligned,
+                )
+            )
+
+        if not results:
+            print("No results collected.")
+            continue
+
+        df = pd.DataFrame([result.__dict__ for result in results])
+        if window == 5:
+            df.to_csv("results.csv", index=False)
+
+        alignment_rate = df["aligned"].mean()
+        correlation = df["sentiment_score"].corr(df["price_return"])
+
+        print(f"Alignment rate: {alignment_rate:.2%}")
+        if pd.isna(correlation):
+            print("Correlation: unavailable (insufficient data)")
+        else:
+            print(f"Correlation: {correlation:.2f}")
 
 
 if __name__ == "__main__":
