@@ -2,8 +2,19 @@ from pathlib import Path
 from transformers import pipeline
 import os
 
-# import FinBERT data classification
-classifier = pipeline("text-classification", model="ProsusAI/finbert", token=os.getenv("HF_TOKEN")) 
+# Lazy-load the classifier so it is only initialised on first use,
+# not at import time (which would fail during the Render build phase).
+_classifier = None
+
+def _get_classifier():
+    global _classifier
+    if _classifier is None:
+        _classifier = pipeline(
+            "text-classification",
+            model="ProsusAI/finbert",
+            token=os.getenv("HF_TOKEN"),
+        )
+    return _classifier
 
 # extract and return company name, year and quarter
 def parse_filepath(path):
@@ -52,7 +63,7 @@ def chunk_transcript(text, max_tokens=400):
 
 # gets an overall sentiment score from the transcript text
 def get_sentiment_score(transcript):
-    result = classifier(transcript, truncation=True, max_length=512)[0] # label: pos/neg/ntr, score: 0-1
+    result = _get_classifier()(transcript, truncation=True, max_length=512)[0] # label: pos/neg/ntr, score: 0-1
     label = result["label"].lower()
     confidence = result["score"]
 

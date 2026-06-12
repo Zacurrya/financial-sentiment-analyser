@@ -1,6 +1,8 @@
 kaggle
 transformers
+torch
 yfinance
+curl_cffi
 pandas
 fastapi
 uvicorn
