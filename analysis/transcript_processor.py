@@ -2,8 +2,7 @@ from pathlib import Path
 from transformers import pipeline
 import os
 
-# Lazy-load the classifier so it is only initialised on first use,
-# not at import time (which would fail during the Render build phase).
+# lazy-load the classifier so it is only initialised on first use
 _classifier = None
 
 def _get_classifier():

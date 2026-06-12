@@ -1,13 +1,17 @@
-from supabase import create_client
+from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL") or ""
-SUPABASE_KEY = os.getenv("SUPABASE_KEY") or ""
+_supabase: Client | None = None
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set in the environment")
-
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+def get_supabase() -> Client:
+    global _supabase
+    if _supabase is None:
+        url = os.getenv("SUPABASE_URL") or ""
+        key = os.getenv("SUPABASE_KEY") or ""
+        if not url or not key:
+            raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set in the environment")
+        _supabase = create_client(url, key)
+    return _supabase

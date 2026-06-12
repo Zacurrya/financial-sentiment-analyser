@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger("uvicorn.error")
 
 sys.path.append(str(Path(__file__).parent.parent))
-from db import supabase
+from db import get_supabase
 from models import EarningsCall
 from typing import cast
 class CacheService:
@@ -15,7 +15,7 @@ class CacheService:
         if year is None or quarter is None:
             return None
             
-        result = supabase.table("earnings_calls")\
+        result = get_supabase().table("earnings_calls")\
             .select("*")\
             .eq("ticker", ticker)\
             .eq("financial_year", year)\
@@ -31,7 +31,7 @@ class CacheService:
     
     
     def get_most_recent_earnings_call(self, ticker: str) -> EarningsCall | None:
-        result = supabase.table("earnings_calls")\
+        result = get_supabase().table("earnings_calls")\
             .select("*")\
             .eq("ticker", ticker)\
             .order("financial_year", desc=True)\
@@ -49,6 +49,6 @@ class CacheService:
     
     
     def store(self, earnings_call: EarningsCall):
-        supabase.table("earnings_calls").insert(earnings_call.model_dump()).execute()
+        get_supabase().table("earnings_calls").insert(earnings_call.model_dump()).execute()
     
     
