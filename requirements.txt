@@ -11,3 +11,5 @@ requests
 pydantic
 dotenv
 supabase
+pytest
+httpx

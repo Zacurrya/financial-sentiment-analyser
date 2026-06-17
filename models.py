@@ -17,6 +17,21 @@ class EarningsCall(BaseModel):
     label: str
 
 
+class TranscriptOnly(BaseModel):
+    """Lightweight response that excludes sentiment analysis fields.
+    Use this when you want to avoid loading the FinBERT model."""
+    model_config = {"extra": "ignore"}
+
+    ticker: str
+    financial_quarter: int
+    financial_year: int
+    date: str
+    summary: str
+    takeaways: List[str]
+    risks: List[str]
+    transcript: str
+
+
 class SerpUrl(BaseModel):
     url: str
     rank: Optional[int] = None

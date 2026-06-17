@@ -2,7 +2,7 @@ import logging
 
 from scraping.scraper import extract_transcript, scrape_site
 from scraping.url_fetching import get_transcript_url
-from models import EarningsCall
+from models import EarningsCall, TranscriptOnly
 from analysis.transcript_processor import get_sentiment_score
 
 logger = logging.getLogger(__name__)
